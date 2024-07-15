@@ -1,14 +1,19 @@
 import { Facebook, Google, RemoveRedEye } from "@mui/icons-material";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
+import bgImg from "../assets/expenses.jpg";
 
 const Signup = () => {
   return (
     <Box height="100vh">
       <Box
         height="20vh"
-        bgcolor="#000"
-        sx={{ p: "24px" }}
+        sx={{
+          backgroundImage: "url(" + bgImg + ")",
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+          p: "24px",
+        }}
         display="flex"
         flexDirection="column"
         alignItems="start"
