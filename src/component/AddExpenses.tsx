@@ -37,7 +37,7 @@ const AddExpenses = () => {
           variant="outlined"
           fullWidth
           InputProps={{ disableUnderline: true }}
-          sx={{ borderRadius: "8px", p: "4px" }}
+          sx={{ borderRadius: "8px", p: "4px", mb: "12px" }}
           label="What for"
           type="text"
           placeholder="what for"
@@ -48,7 +48,7 @@ const AddExpenses = () => {
           variant="outlined"
           fullWidth
           InputProps={{ disableUnderline: true }}
-          sx={{ borderRadius: "8px", p: "4px" }}
+          sx={{ borderRadius: "8px", p: "4px", mb: "12px" }}
           label="Amount"
           type="number"
           placeholder="Amount"
