@@ -6,17 +6,19 @@ import AddExpenses from "../component/AddExpenses";
 import CalculateExpenditure from "../component/CalculateExpenditure";
 import supabase from "../config/supabaseClient";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [fetchError, setFetchError] = useState("");
   const [expenses, setExpenses] = useState<any[]>([]);
+  const goTo = useNavigate();
 
   useEffect(() => {
     const fetchExpenses = async () => {
       const { data, error } = await supabase.from("expenses").select();
 
       if (error) {
-        setFetchError("Could not fetch the smoothies");
+        setFetchError("Could not fetch data");
         setExpenses([]);
         console.log(error);
       }
@@ -52,6 +54,7 @@ const Home = () => {
                 cursor: "pointer",
                 "::-ms-tooltip": "Logout",
               }}
+              onClick={() => goTo("/login")}
             />
           </div>
         </Box>
@@ -98,7 +101,11 @@ const Home = () => {
       <BottomDrawer open={open} onClose={() => setOpen(false)}>
         <AddExpenses />
       </BottomDrawer>
-      <BottomDrawer open={openCal} onClose={() => setOpenCal(false)}>
+      <BottomDrawer
+        drawerHeight="65"
+        open={openCal}
+        onClose={() => setOpenCal(false)}
+      >
         <CalculateExpenditure />
       </BottomDrawer>
     </>
