@@ -2,8 +2,34 @@ import { Facebook, Google, RemoveRedEye } from "@mui/icons-material";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import bgImg from "../assets/expenses.jpg";
+import supabase from "../config/supabaseClient";
+import React, { useState } from "react";
 
 const Signup = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
+        },
+      });
+
+      console.log(email, password, fullName);
+      alert("Check you email for verification link");
+    } catch (error) {
+      alert(error);
+    }
+  };
+
   return (
     <Box height="100vh">
       <Box
@@ -26,13 +52,14 @@ const Signup = () => {
           Account for your expenses today
         </Typography>
       </Box>
-      <Box p="24px">
+      <form style={{ padding: "24px" }} onSubmit={handleSubmit}>
         <TextField
           type="text"
           label="Full Name"
           fullWidth
           sx={{ mb: "12px", borderRadius: "12px" }}
           variant="outlined"
+          onChange={(e) => setFullName(e.target.value)}
         />
         <TextField
           type="email"
@@ -40,11 +67,13 @@ const Signup = () => {
           fullWidth
           sx={{ mb: "12px", borderRadius: "12px" }}
           variant="outlined"
+          onChange={(e) => setEmail(e.target.value)}
         />
         <TextField
           type="password"
           label="Password"
           fullWidth
+          onChange={(e) => setPassword(e.target.value)}
           InputProps={{
             endAdornment: <RemoveRedEye />,
           }}
@@ -64,6 +93,7 @@ const Signup = () => {
             p: "12px",
             mb: "12px",
           }}
+          type="submit"
         >
           Signup
         </Button>
@@ -112,7 +142,7 @@ const Signup = () => {
             Login
           </Link>
         </Typography>
-      </Box>
+      </form>
     </Box>
   );
 };
