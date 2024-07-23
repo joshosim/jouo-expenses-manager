@@ -13,22 +13,7 @@ const Home = () => {
   const [expenses, setExpenses] = useState<any[]>([]);
   const goTo = useNavigate();
   const [totalAmount, setTotalAmount] = useState<number | null>(null);
-  const getTotalAmtOfExpenses = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("expenses")
-        .select("amount", { count: "exact", head: true });
-      if (error) {
-        throw error;
-      }
-
-      const total = data?.reduce((acc, item) => acc + item.amount, 0);
-      return total || 0;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  };
+ 
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -50,6 +35,22 @@ const Home = () => {
 
   useEffect(() => {
     const fetchTotalExpenses = async () => {
+       const getTotalAmtOfExpenses = async () => {
+         try {
+           const { data, error } = await supabase
+             .from("expenses")
+             .select("amount", { count: "exact", head: true });
+           if (error) {
+             throw error;
+           }
+
+           const total = data?.reduce((acc, item) => acc + item.amount, 0);
+           return total || 0;
+         } catch (error) {
+           console.error(error);
+           return null;
+         }
+       };
       const total = await getTotalAmtOfExpenses();
       setTotalAmount(total);
     };
