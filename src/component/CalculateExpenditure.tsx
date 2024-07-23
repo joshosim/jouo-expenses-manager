@@ -9,10 +9,15 @@ const CalculateExpenditure = () => {
   const [wants, setWants] = useState(0);
 
   const handleCalculate = (money: number) => {
-    setTithe(money * 0.1);
-    setSavings(money * 0.05);
-    setNeeds(money * 0.5);
-    setWants(money * 0.35);
+    let tithe = money * 0.1;
+    let theMoney = money - tithe;
+    let savings = theMoney * 0.1;
+    let needs = theMoney * 0.5;
+    let wants = theMoney * 0.4;
+    setTithe(tithe);
+    setSavings(savings);
+    setNeeds(needs);
+    setWants(wants);
   };
   return (
     <Box p={2}>

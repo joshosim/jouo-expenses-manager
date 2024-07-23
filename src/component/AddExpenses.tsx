@@ -6,6 +6,7 @@ const AddExpenses = () => {
   const [amount, setAmount] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
   const [formError, setFormError] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormError(false);

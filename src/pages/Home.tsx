@@ -12,6 +12,23 @@ const Home = () => {
   const [fetchError, setFetchError] = useState("");
   const [expenses, setExpenses] = useState<any[]>([]);
   const goTo = useNavigate();
+  const [totalAmount, setTotalAmount] = useState<number | null>(null);
+  const getTotalAmtOfExpenses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("expenses")
+        .select("amount", { count: "exact", head: true });
+      if (error) {
+        throw error;
+      }
+
+      const total = data?.reduce((acc, item) => acc + item.amount, 0);
+      return total || 0;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -27,7 +44,16 @@ const Home = () => {
         setExpenses(data);
       }
     };
+
     fetchExpenses();
+  }, []);
+
+  useEffect(() => {
+    const fetchTotalExpenses = async () => {
+      const total = await getTotalAmtOfExpenses();
+      setTotalAmount(total);
+    };
+    fetchTotalExpenses();
   }, []);
 
   const [open, setOpen] = useState(false);
@@ -58,9 +84,14 @@ const Home = () => {
             />
           </div>
         </Box>
-        <Typography fontSize={16} fontWeight={600}>
-          Recent transactions
-        </Typography>
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Typography fontSize={16} fontWeight={600}>
+            Recent transactions
+          </Typography>
+          <Typography fontSize={16} fontWeight={600}>
+            Total : NGN {totalAmount !== null ? totalAmount : " ***"}
+          </Typography>
+        </Box>
         <Box sx={{ scrollBehavior: "smooth" }}>
           {fetchError && <p>{fetchError}</p>}
           {expenses && (

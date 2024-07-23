@@ -23,7 +23,6 @@ const Signup = () => {
         },
       });
 
-      console.log(email, password, fullName);
       alert("Check you email for verification link");
     } catch (error) {
       alert(error);
