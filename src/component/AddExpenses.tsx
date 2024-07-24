@@ -1,4 +1,4 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Backdrop, Box, Button, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import supabase from "../config/supabaseClient";
 
@@ -6,9 +6,11 @@ const AddExpenses = () => {
   const [amount, setAmount] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
   const [formError, setFormError] = useState(false);
+  const [onSend, setOnSend] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     setFormError(false);
 
     if (!title || !amount) {
@@ -19,12 +21,14 @@ const AddExpenses = () => {
     const { data, error } = await supabase
       .from("expenses")
       .insert([{ title, amount }]);
+
+    if (data) {
+      setOnSend(true);
+      setFormError(false);
+    }
     if (error) {
       console.log(error);
       setFormError(true);
-    }
-    if (data) {
-      setFormError(false);
     }
   };
 
@@ -77,6 +81,20 @@ const AddExpenses = () => {
         >
           Please fill all fields
         </Typography>
+      )}
+
+      {onSend && (
+        <Backdrop open={onSend}>
+          <Box bgcolor="#FFF" height="200px" width="200px">
+            <Button
+              variant="text"
+              color="primary"
+              onClick={() => setOnSend(false)}
+            >
+              Close
+            </Button>
+          </Box>
+        </Backdrop>
       )}
     </Box>
   );

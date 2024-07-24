@@ -1,5 +1,5 @@
 import { Box, Fab, Typography } from "@mui/material";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Add, Calculate, Logout } from "@mui/icons-material";
 import BottomDrawer from "../component/BottomDrawer";
 import AddExpenses from "../component/AddExpenses";
@@ -7,17 +7,20 @@ import CalculateExpenditure from "../component/CalculateExpenditure";
 import supabase from "../config/supabaseClient";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { format } from "date-fns";
 
 const Home = () => {
   const [fetchError, setFetchError] = useState("");
   const [expenses, setExpenses] = useState<any[]>([]);
   const goTo = useNavigate();
   const [totalAmount, setTotalAmount] = useState<number | null>(null);
- 
 
   useEffect(() => {
     const fetchExpenses = async () => {
-      const { data, error } = await supabase.from("expenses").select();
+      const { data, error } = await supabase
+        .from("expenses")
+        .select()
+        .order("created_at", { ascending: false });
 
       if (error) {
         setFetchError("Could not fetch data");
@@ -35,24 +38,30 @@ const Home = () => {
 
   useEffect(() => {
     const fetchTotalExpenses = async () => {
-       const getTotalAmtOfExpenses = async () => {
-         try {
-           const { data, error } = await supabase
-             .from("expenses")
-             .select("amount", { count: "exact", head: true });
-           if (error) {
-             throw error;
-           }
+      async function getTotalAmtOfExpenses() {
+        try {
+          const { data, error } = await supabase
+            .from("expenses")
+            .select("amount");
+          if (error) {
+            throw error;
+          }
 
-           const total = data?.reduce((acc, item) => acc + item.amount, 0);
-           return total || 0;
-         } catch (error) {
-           console.error(error);
-           return null;
-         }
-       };
-      const total = await getTotalAmtOfExpenses();
-      setTotalAmount(total);
+          if (data && data.length > 0) {
+            const sum = data.reduce((accumulator, currentValue) => {
+              return accumulator + currentValue.amount;
+            }, 0);
+
+            setTotalAmount(sum);
+          } else {
+            setTotalAmount(0);
+          }
+        } catch (error) {
+          console.error("Error fetching sum: ", error);
+          return null;
+        }
+      }
+      getTotalAmtOfExpenses();
     };
     fetchTotalExpenses();
   }, []);
@@ -90,7 +99,7 @@ const Home = () => {
             Recent transactions
           </Typography>
           <Typography fontSize={16} fontWeight={600}>
-            Total : NGN {totalAmount !== null ? totalAmount : " ***"}
+            Spent : NGN {totalAmount !== null ? totalAmount : " ***"}
           </Typography>
         </Box>
         <Box sx={{ scrollBehavior: "smooth" }}>
@@ -114,7 +123,20 @@ const Home = () => {
                       - NGN {expense.amount}
                     </Typography>
                   </div>
-                  <Typography fontSize={14}>{expense.created_at}</Typography>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography fontSize={14}>
+                      {format(expense.created_at, "EEE")}
+                    </Typography>
+                    <Typography fontSize={14}>
+                      {format(expense.created_at, "h:mm a")}
+                    </Typography>
+                  </div>
                 </Box>
               ))}
             </Box>
@@ -123,7 +145,7 @@ const Home = () => {
         {!open && !openCal && (
           <Fab
             color="primary"
-            sx={{ position: "absolute", bottom: 10, right: 10 }}
+            sx={{ position: "fixed", bottom: 10, right: 10 }}
             onClick={() => setOpen(true)}
           >
             <Add />
