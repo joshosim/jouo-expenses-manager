@@ -2,7 +2,7 @@ import { Facebook, Google, RemoveRedEye } from "@mui/icons-material";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import bgImg from "../assets/expenses.jpg";
-import supabase from "../config/supabaseClient";
+// import supabase from "../config/supabaseClient";
 import React, { useState } from "react";
 
 const Signup = () => {
@@ -12,21 +12,21 @@ const Signup = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
-        },
-      });
+    // try {
+    //   const { data, error } = await supabase.auth.signUp({
+    //     email: email,
+    //     password: password,
+    //     options: {
+    //       data: {
+    //         full_name: fullName,
+    //       },
+    //     },
+    //   });
 
-      alert("Check you email for verification link");
-    } catch (error) {
-      alert(error);
-    }
+    //   alert("Check you email for verification link");
+    // } catch (error) {
+    //   alert(error);
+    // }
   };
 
   return (
