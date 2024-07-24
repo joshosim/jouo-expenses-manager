@@ -6,9 +6,9 @@ import bgImg from "../assets/expenses.jpg";
 import React, { useState } from "react";
 
 const Signup = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [password, setPassword] = useState("");
+  // const [fullName, setFullName] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -58,7 +58,7 @@ const Signup = () => {
           fullWidth
           sx={{ mb: "12px", borderRadius: "12px" }}
           variant="outlined"
-          onChange={(e) => setFullName(e.target.value)}
+          //onChange={(e) => setFullName(e.target.value)}
         />
         <TextField
           type="email"
@@ -66,13 +66,13 @@ const Signup = () => {
           fullWidth
           sx={{ mb: "12px", borderRadius: "12px" }}
           variant="outlined"
-          onChange={(e) => setEmail(e.target.value)}
+          //onChange={(e) => setEmail(e.target.value)}
         />
         <TextField
           type="password"
           label="Password"
           fullWidth
-          onChange={(e) => setPassword(e.target.value)}
+          //onChange={(e) => setPassword(e.target.value)}
           InputProps={{
             endAdornment: <RemoveRedEye />,
           }}
