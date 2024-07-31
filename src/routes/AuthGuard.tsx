@@ -1,7 +1,19 @@
-import React from "react";
+import React, { useContext } from "react";
+import { Navigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
-const AuthGuard = () => {
-  return <div>AuthGuard</div>;
+interface AuthGuardProps {
+  children: React.ReactNode;
+}
+
+const AuthGuard = ({ children }: AuthGuardProps) => {
+  const { currentUser } = useContext(AuthContext);
+
+  if (!currentUser) {
+    return <Navigate to="/login" replace />; // Redirect to login if not authenticated
+  }
+
+  return <>{children}</>; // Render the children if authenticated
 };
 
 export default AuthGuard;

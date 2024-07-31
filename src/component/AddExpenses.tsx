@@ -1,6 +1,7 @@
 import { Backdrop, Box, Button, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
-import supabase from "../config/supabaseClient";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../config/firebase";
 
 const AddExpenses = () => {
   const [amount, setAmount] = useState<number>(0);
@@ -13,22 +14,20 @@ const AddExpenses = () => {
 
     setFormError(false);
 
+    try {
+      const docRef = await addDoc(collection(db, "users"), {
+        first: "Ada",
+        last: "Lovelace",
+        born: 1815,
+      });
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+
     if (!title || !amount) {
       setFormError(true);
       return;
-    }
-
-    const { data, error } = await supabase
-      .from("expenses")
-      .insert([{ title, amount }]);
-
-    if (data) {
-      setOnSend(true);
-      setFormError(false);
-    }
-    if (error) {
-      console.log(error);
-      setFormError(true);
     }
   };
 

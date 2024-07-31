@@ -1,10 +1,43 @@
 import { Facebook, Google, RemoveRedEye } from "@mui/icons-material";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import bgImg from "../assets/expenses.jpg";
-
+import { useContext, useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../config/firebase";
+import { AuthContext } from "../context/AuthContext";
 const Login = () => {
   const goTo = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [togglePassword, setTogglePassword] = useState(false);
+  const { dispatch } = useContext(AuthContext);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const onTogglePass = () => {
+    setTogglePassword(!togglePassword);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        dispatch({ type: "LOGIN", payload: user });
+        setIsLoading(false);
+        goTo("/");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode, errorMessage);
+      });
+  };
+
   return (
     <Box height="100vh">
       <Box
@@ -29,40 +62,56 @@ const Login = () => {
         </Typography>
       </Box>
       <Box p="24px">
-        <TextField
-          type="email"
-          label="Email"
-          fullWidth
-          sx={{ mb: "12px", borderRadius: "12px" }}
-          variant="outlined"
-        />
-        <TextField
-          type="password"
-          label="Password"
-          fullWidth
-          InputProps={{
-            endAdornment: <RemoveRedEye />,
-          }}
-          sx={{ mb: "12px", borderRadius: "12px" }}
-          variant="outlined"
-        />
-        <Typography fontSize={12} textAlign="right" sx={{ mb: "12px" }}>
-          Forgot Password ?
-        </Typography>
-        <Button
-          fullWidth
-          variant="contained"
-          sx={{
-            borderRadiud: "8px",
-            fontSize: 14,
-            fontWeight: 400,
-            p: "12px",
-            mb: "12px",
-          }}
-          onClick={() => goTo("/")}
-        >
-          Login
-        </Button>
+        <form action="" onSubmit={handleSubmit}>
+          <TextField
+            type="email"
+            label="Email"
+            fullWidth
+            sx={{ mb: "12px", borderRadius: "12px" }}
+            variant="outlined"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <TextField
+            type={!togglePassword ? "password" : "text"}
+            label="Password"
+            fullWidth
+            InputProps={{
+              endAdornment: !togglePassword ? (
+                <RemoveRedEye
+                  onClick={onTogglePass}
+                  sx={{ cursor: "pointer" }}
+                />
+              ) : (
+                <VisibilityOffOutlinedIcon
+                  onClick={onTogglePass}
+                  sx={{ cursor: "pointer" }}
+                />
+              ),
+            }}
+            sx={{ mb: "12px", borderRadius: "12px" }}
+            variant="outlined"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <Typography fontSize={12} textAlign="right" sx={{ mb: "12px" }}>
+            Forgot Password ?
+          </Typography>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{
+              borderRadiud: "8px",
+              fontSize: 14,
+              fontWeight: 400,
+              p: "12px",
+              mb: "12px",
+            }}
+          >
+            Login
+          </Button>
+        </form>
 
         <Typography fontSize={14} textAlign="center" sx={{ mb: "12px" }}>
           or login with

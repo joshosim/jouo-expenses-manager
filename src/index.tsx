@@ -1,12 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
 import { ThemeProvider } from "@mui/material";
 
 import reportWebVitals from "./reportWebVitals";
 import { theme } from "./theme";
-import AppRoute from "./routes/AppRoute";
 import { BrowserRouter } from "react-router-dom";
+import { AuthContextProvider } from "./context/AuthContext";
+import AppRoutes from "./routes/AppRoutes";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -14,9 +14,11 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <ThemeProvider theme={theme}>
-        <AppRoute />
-      </ThemeProvider>
+      <AuthContextProvider>
+        <ThemeProvider theme={theme}>
+          <AppRoutes />
+        </ThemeProvider>
+      </AuthContextProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

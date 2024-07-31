@@ -4,10 +4,12 @@ import { Add, Calculate, Logout } from "@mui/icons-material";
 import BottomDrawer from "../component/BottomDrawer";
 import AddExpenses from "../component/AddExpenses";
 import CalculateExpenditure from "../component/CalculateExpenditure";
-import supabase from "../config/supabaseClient";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import { signOut } from "firebase/auth";
+import { auth, db } from "../config/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 const Home = () => {
   const [fetchError, setFetchError] = useState("");
@@ -15,22 +17,25 @@ const Home = () => {
   const goTo = useNavigate();
   const [totalAmount, setTotalAmount] = useState<number | null>(null);
 
+  const logout = () => {
+    signOut(auth)
+      .then(() => {
+        // Sign-out successful.
+        localStorage.removeItem("user");
+        console.log("// Sign-out successful.");
+        goTo("/login");
+      })
+      .catch((error) => {
+        // An error happened.
+        console.log(error);
+      });
+  };
   useEffect(() => {
     const fetchExpenses = async () => {
-      const { data, error } = await supabase
-        .from("expenses")
-        .select()
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        setFetchError("Could not fetch data");
-        setExpenses([]);
-        console.log(error);
-      }
-      if (data) {
-        setFetchError("");
-        setExpenses(data);
-      }
+      const querySnapshot = await getDocs(collection(db, "users"));
+      querySnapshot.forEach((doc) => {
+        console.log(`${doc.id} => ${doc.data()}`);
+      });
     };
 
     fetchExpenses();
@@ -40,22 +45,6 @@ const Home = () => {
     const fetchTotalExpenses = async () => {
       async function getTotalAmtOfExpenses() {
         try {
-          const { data, error } = await supabase
-            .from("expenses")
-            .select("amount");
-          if (error) {
-            throw error;
-          }
-
-          if (data && data.length > 0) {
-            const sum = data.reduce((accumulator, currentValue) => {
-              return accumulator + currentValue.amount;
-            }, 0);
-
-            setTotalAmount(sum);
-          } else {
-            setTotalAmount(0);
-          }
         } catch (error) {
           console.error("Error fetching sum: ", error);
           return null;
@@ -90,7 +79,7 @@ const Home = () => {
                 cursor: "pointer",
                 "::-ms-tooltip": "Logout",
               }}
-              onClick={() => goTo("/login")}
+              onClick={logout}
             />
           </div>
         </Box>
@@ -103,6 +92,33 @@ const Home = () => {
           </Typography>
         </Box>
         <Box sx={{ scrollBehavior: "smooth" }}>
+          <Box border="1px solid gray" borderRadius="8px" my={1} p={2}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: "8px",
+              }}
+            >
+              <Typography fontWeight={600} fontSize={14}>
+                Food
+              </Typography>
+              <Typography fontWeight={600} fontSize={14}>
+                - NGN 1000
+              </Typography>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography fontSize={14}>14th Aug</Typography>
+              <Typography fontSize={14}>4: 00pm</Typography>
+            </div>
+          </Box>
           {fetchError && <p>{fetchError}</p>}
           {expenses && (
             <Box>
