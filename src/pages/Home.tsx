@@ -1,21 +1,84 @@
 import { Box, Fab, Typography } from "@mui/material";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Add, Calculate, Logout } from "@mui/icons-material";
 import BottomDrawer from "../component/BottomDrawer";
 import AddExpenses from "../component/AddExpenses";
 import CalculateExpenditure from "../component/CalculateExpenditure";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { format } from "date-fns";
 import { signOut } from "firebase/auth";
 import { auth, db } from "../config/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import ExpensesLogo from "../assets/expe.png";
+import {
+  collection,
+  getDocs,
+  query,
+  Timestamp,
+  where,
+  orderBy,
+} from "firebase/firestore";
+import { AuthContext } from "../context/AuthContext";
+
+interface Expense {
+  title: string;
+  amount: number;
+  timestamp: Date;
+}
 
 const Home = () => {
   const [fetchError, setFetchError] = useState("");
-  const [expenses, setExpenses] = useState<any[]>([]);
   const goTo = useNavigate();
   const [totalAmount, setTotalAmount] = useState<number | null>(null);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const { currentUser } = useContext(AuthContext);
+  const [open, setOpen] = useState(false);
+  const [openCal, setOpenCal] = useState(false);
+  const [effectRunCount, setEffectRunCount] = useState(0);
+
+  const fetchUserExpenses = async (): Promise<Expense[]> => {
+    if (!currentUser) {
+      throw new Error("User is not authenticated.");
+    }
+
+    const expensesRef = collection(db, "user_expenses");
+
+    const q = query(
+      expensesRef,
+      where("uid", "==", currentUser.uid),
+      orderBy("timestamp", "desc") // Order by timestamp in descending order
+    );
+    const querySnapshot = await getDocs(q);
+
+    const userExpenses: Expense[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const timestamp = (data.timestamp as Timestamp)?.toDate();
+      userExpenses.push({
+        ...data,
+        id: doc.id,
+        timestamp,
+      } as unknown as Expense);
+    });
+
+    return userExpenses;
+  };
+
+  useEffect(() => {
+    const loadExpenses = async () => {
+      try {
+        const expensesData = await fetchUserExpenses();
+        setExpenses(expensesData);
+      } catch (error) {
+        console.error("Error fetching expenses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadExpenses();
+  }, [fetchUserExpenses()]);
+
+  if (loading) return <Box>Loading...</Box>;
 
   const logout = () => {
     signOut(auth)
@@ -30,40 +93,23 @@ const Home = () => {
         console.log(error);
       });
   };
-  useEffect(() => {
-    const fetchExpenses = async () => {
-      const querySnapshot = await getDocs(collection(db, "users"));
-      querySnapshot.forEach((doc) => {
-        console.log(`${doc.id} => ${doc.data()}`);
-      });
-    };
 
-    fetchExpenses();
-  }, []);
-
-  useEffect(() => {
-    const fetchTotalExpenses = async () => {
-      async function getTotalAmtOfExpenses() {
-        try {
-        } catch (error) {
-          console.error("Error fetching sum: ", error);
-          return null;
-        }
-      }
-      getTotalAmtOfExpenses();
-    };
-    fetchTotalExpenses();
-  }, []);
-
-  const [open, setOpen] = useState(false);
-  const [openCal, setOpenCal] = useState(false);
   return (
     <>
       <Box p={2}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Typography fontSize={30} fontWeight={700}>
-            Hello, <br /> Osim
-          </Typography>
+          <Box>
+            <img
+              src={ExpensesLogo}
+              alt="/"
+              style={{ objectFit: "cover" }}
+              height="75px"
+              width="75px"
+            />
+            <Typography fontSize={12} fontWeight={700} color="green">
+              {currentUser.email}
+            </Typography>
+          </Box>
 
           <div>
             <Calculate
@@ -83,7 +129,12 @@ const Home = () => {
             />
           </div>
         </Box>
-        <Box display="flex" alignItems="center" justifyContent="space-between">
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          mt="24px"
+        >
           <Typography fontSize={16} fontWeight={600}>
             Recent transactions
           </Typography>
@@ -92,33 +143,6 @@ const Home = () => {
           </Typography>
         </Box>
         <Box sx={{ scrollBehavior: "smooth" }}>
-          <Box border="1px solid gray" borderRadius="8px" my={1} p={2}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: "8px",
-              }}
-            >
-              <Typography fontWeight={600} fontSize={14}>
-                Food
-              </Typography>
-              <Typography fontWeight={600} fontSize={14}>
-                - NGN 1000
-              </Typography>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Typography fontSize={14}>14th Aug</Typography>
-              <Typography fontSize={14}>4: 00pm</Typography>
-            </div>
-          </Box>
           {fetchError && <p>{fetchError}</p>}
           {expenses && (
             <Box>
@@ -147,14 +171,18 @@ const Home = () => {
                     }}
                   >
                     <Typography fontSize={14}>
-                      {format(expense.created_at, "EEE")}
+                      {expense.timestamp &&
+                        `on ${expense.timestamp.toLocaleString()}`}
                     </Typography>
-                    <Typography fontSize={14}>
-                      {format(expense.created_at, "h:mm a")}
-                    </Typography>
+                    {/* <Typography fontSize={14}>{expense.timestamp}</Typography> */}
                   </div>
                 </Box>
               ))}
+            </Box>
+          )}
+          {!expenses && (
+            <Box>
+              <Typography>No Expenses Made Today</Typography>
             </Box>
           )}
         </Box>
@@ -168,7 +196,11 @@ const Home = () => {
           </Fab>
         )}
       </Box>
-      <BottomDrawer open={open} onClose={() => setOpen(false)}>
+      <BottomDrawer
+        open={open}
+        onClose={() => setOpen(false)}
+        drawerHeight="50vh"
+      >
         <AddExpenses />
       </BottomDrawer>
       <BottomDrawer
