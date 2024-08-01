@@ -14,6 +14,7 @@ const Login = () => {
   const [togglePassword, setTogglePassword] = useState(false);
   const { dispatch } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const onTogglePass = () => {
     setTogglePassword(!togglePassword);
@@ -32,9 +33,9 @@ const Login = () => {
         goTo("/");
       })
       .catch((error) => {
-        const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
+        setError(errorMessage);
+        setIsLoading(false);
       });
   };
 
@@ -109,10 +110,19 @@ const Login = () => {
               mb: "12px",
             }}
           >
-            Login
+            {isLoading ? "Logging in..." : "Login"}
           </Button>
         </form>
 
+        {error && (
+          <Typography
+            fontSize={14}
+            textAlign="center"
+            sx={{ my: "12px", color: "red" }}
+          >
+            {error}
+          </Typography>
+        )}
         <Typography fontSize={14} textAlign="center" sx={{ mb: "12px" }}>
           or login with
         </Typography>
@@ -134,6 +144,7 @@ const Login = () => {
             }}
             fullWidth
             startIcon={<Google />}
+            disabled
           >
             Google
           </Button>
@@ -147,6 +158,7 @@ const Login = () => {
             }}
             fullWidth
             startIcon={<Facebook />}
+            disabled
           >
             Facebook
           </Button>

@@ -76,7 +76,7 @@ const Home = () => {
       }
     };
     loadExpenses();
-  }, [fetchUserExpenses()]);
+  }, [setTimeout(() => fetchUserExpenses(), 5000)]);
 
   if (loading) return <Box>Loading...</Box>;
 

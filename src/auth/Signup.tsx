@@ -14,6 +14,8 @@ const Signup = () => {
   const navigate = useNavigate();
   const { dispatch } = useContext(AuthContext);
   const [togglePassword, setTogglePassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const onTogglePass = () => {
     setTogglePassword(!togglePassword);
@@ -21,19 +23,20 @@ const Signup = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
 
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed up
         const user = userCredential.user;
         dispatch({ type: "LOGIN", payload: user });
-
+        setIsLoading(false);
         navigate("/");
       })
       .catch((error) => {
-        const errorCode = error.code;
         const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
+        setError(errorMessage);
+        setIsLoading(false);
       });
   };
 
@@ -103,8 +106,18 @@ const Signup = () => {
           }}
           type="submit"
         >
-          Signup
+          {isLoading ? "Signing up..." : "Signup"}
         </Button>
+
+        {error && (
+          <Typography
+            fontSize={14}
+            textAlign="center"
+            sx={{ my: "12px", color: "red" }}
+          >
+            {error}
+          </Typography>
+        )}
 
         <Typography fontSize={14} textAlign="center" sx={{ mb: "12px" }}>
           or sign up with
@@ -127,6 +140,7 @@ const Signup = () => {
             }}
             fullWidth
             startIcon={<Google />}
+            disabled
           >
             Google
           </Button>
@@ -140,6 +154,7 @@ const Signup = () => {
             }}
             fullWidth
             startIcon={<Facebook />}
+            disabled
           >
             Facebook
           </Button>
