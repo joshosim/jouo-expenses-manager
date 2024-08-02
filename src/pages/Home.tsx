@@ -1,6 +1,14 @@
 import { Box, Fab, Typography } from "@mui/material";
 import { useContext, useState } from "react";
-import { Add, Calculate, Logout } from "@mui/icons-material";
+import {
+  Add,
+  Calculate,
+  CalendarViewMonthRounded,
+  Chat,
+  DashboardCustomizeOutlined,
+  DateRange,
+  Logout,
+} from "@mui/icons-material";
 import BottomDrawer from "../component/BottomDrawer";
 import AddExpenses from "../component/AddExpenses";
 import CalculateExpenditure from "../component/CalculateExpenditure";
@@ -18,6 +26,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { AuthContext } from "../context/AuthContext";
+import AppLayout from "../Layout/AppLayout";
 
 interface Expense {
   title: string;
@@ -34,7 +43,7 @@ const Home = () => {
   const { currentUser } = useContext(AuthContext);
   const [open, setOpen] = useState(false);
   const [openCal, setOpenCal] = useState(false);
-  const [effectRunCount, setEffectRunCount] = useState(0);
+  const navigate = useNavigate();
 
   const fetchUserExpenses = async (): Promise<Expense[]> => {
     if (!currentUser) {
@@ -95,7 +104,7 @@ const Home = () => {
   };
 
   return (
-    <>
+    <AppLayout>
       <Box p={2}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box>
@@ -189,7 +198,7 @@ const Home = () => {
         {!open && !openCal && (
           <Fab
             color="primary"
-            sx={{ position: "fixed", bottom: 10, right: 10 }}
+            sx={{ position: "fixed", bottom: 90, right: 10 }}
             onClick={() => setOpen(true)}
           >
             <Add />
@@ -210,7 +219,7 @@ const Home = () => {
       >
         <CalculateExpenditure />
       </BottomDrawer>
-    </>
+    </AppLayout>
   );
 };
 
