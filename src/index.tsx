@@ -1,12 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { ThemeProvider } from "@mui/material";
-
+import { Toaster } from "react-hot-toast";
 import reportWebVitals from "./reportWebVitals";
 import { theme } from "./theme";
 import { BrowserRouter } from "react-router-dom";
 import { AuthContextProvider } from "./context/AuthContext";
 import AppRoutes from "./routes/AppRoutes";
+import { toastOption } from "./config/toastConfig";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -16,6 +17,7 @@ root.render(
     <BrowserRouter>
       <AuthContextProvider>
         <ThemeProvider theme={theme}>
+          <Toaster toastOptions={toastOption} />
           <AppRoutes />
         </ThemeProvider>
       </AuthContextProvider>

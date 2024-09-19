@@ -4,9 +4,9 @@ import { Link, useNavigate } from "react-router-dom";
 import bgImg from "../assets/expenses.jpg";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import React, { useContext, useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../config/firebase";
 import { AuthContext } from "../context/AuthContext";
+import supabase from "../config/superbase";
+import toast from "react-hot-toast";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -25,20 +25,40 @@ const Signup = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed up
-        const user = userCredential.user;
-        dispatch({ type: "LOGIN", payload: user });
-        setIsLoading(false);
-        navigate("/");
-      })
-      .catch((error) => {
-        const errorMessage = error.message;
-        setError(errorMessage);
-        setIsLoading(false);
-      });
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+    });
+    toast.success("Account Registered!");
+    if (data?.session?.access_token) {
+      localStorage.setItem("token", data?.session?.access_token);
+      navigate("/");
+    }
+    console.log(data);
   };
+
+  const { data: theData } = supabase.auth.onAuthStateChange(
+    (event, session) => {
+      console.log(event, session);
+
+      if (event === "INITIAL_SESSION") {
+        // handle initial session
+      } else if (event === "SIGNED_IN") {
+        navigate("/");
+      } else if (event === "SIGNED_OUT") {
+        // handle sign out event
+      } else if (event === "PASSWORD_RECOVERY") {
+        // handle password recovery event
+      } else if (event === "TOKEN_REFRESHED") {
+        // handle token refreshed event
+      } else if (event === "USER_UPDATED") {
+        // handle user updated event
+      }
+    }
+  );
+
+  // call unsubscribe to remove the callback
+  theData.subscription.unsubscribe();
 
   return (
     <Box height="100vh">

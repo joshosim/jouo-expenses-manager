@@ -1,37 +1,24 @@
 import { Box, Fab, Typography } from "@mui/material";
 import { useContext, useState } from "react";
-import {
-  Add,
-  Calculate,
-  CalendarViewMonthRounded,
-  Chat,
-  DashboardCustomizeOutlined,
-  DateRange,
-  Logout,
-} from "@mui/icons-material";
+import { Add, Calculate, Logout } from "@mui/icons-material";
 import BottomDrawer from "../component/BottomDrawer";
 import AddExpenses from "../component/AddExpenses";
 import CalculateExpenditure from "../component/CalculateExpenditure";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { signOut } from "firebase/auth";
-import { auth, db } from "../config/firebase";
+
 import ExpensesLogo from "../assets/expe.png";
-import {
-  collection,
-  getDocs,
-  query,
-  Timestamp,
-  where,
-  orderBy,
-} from "firebase/firestore";
+
 import { AuthContext } from "../context/AuthContext";
 import AppLayout from "../Layout/AppLayout";
+import supabase from "../config/superbase";
+import { parseISO, format } from "date-fns";
 
 interface Expense {
+  id: any;
   title: string;
   amount: number;
-  timestamp: Date;
+  created_at: Date;
 }
 
 const Home = () => {
@@ -45,63 +32,19 @@ const Home = () => {
   const [openCal, setOpenCal] = useState(false);
   const navigate = useNavigate();
 
-  const fetchUserExpenses = async (): Promise<Expense[]> => {
-    if (!currentUser) {
-      throw new Error("User is not authenticated.");
-    }
-
-    const expensesRef = collection(db, "user_expenses");
-
-    const q = query(
-      expensesRef,
-      where("uid", "==", currentUser.uid),
-      orderBy("timestamp", "desc") // Order by timestamp in descending order
-    );
-    const querySnapshot = await getDocs(q);
-
-    const userExpenses: Expense[] = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      const timestamp = (data.timestamp as Timestamp)?.toDate();
-      userExpenses.push({
-        ...data,
-        id: doc.id,
-        timestamp,
-      } as unknown as Expense);
-    });
-
-    return userExpenses;
+  const formatTheTime = (isoDateString: any) => {
+    const date = parseISO(isoDateString);
+    const formattedDate = format(date, "yyyy-MM-dd HH:mm");
+    return formattedDate;
   };
-
   useEffect(() => {
-    const loadExpenses = async () => {
-      try {
-        const expensesData = await fetchUserExpenses();
-        setExpenses(expensesData);
-      } catch (error) {
-        console.error("Error fetching expenses:", error);
-      } finally {
-        setLoading(false);
-      }
+    const fetchData = async () => {
+      const { data, error } = await supabase.from("expenses").select();
+      console.log(data);
+      setExpenses(data || []);
     };
-    loadExpenses();
-  }, [setTimeout(() => fetchUserExpenses(), 5000)]);
-
-  if (loading) return <Box>Loading...</Box>;
-
-  const logout = () => {
-    signOut(auth)
-      .then(() => {
-        // Sign-out successful.
-        localStorage.removeItem("user");
-        console.log("// Sign-out successful.");
-        goTo("/login");
-      })
-      .catch((error) => {
-        // An error happened.
-        console.log(error);
-      });
-  };
+    fetchData();
+  }, []);
 
   return (
     <AppLayout>
@@ -129,13 +72,6 @@ const Home = () => {
                 "::-ms-tooltip": "Calculate Expenses",
               }}
             />
-            <Logout
-              sx={{
-                cursor: "pointer",
-                "::-ms-tooltip": "Logout",
-              }}
-              onClick={logout}
-            />
           </div>
         </Box>
         <Box
@@ -156,7 +92,13 @@ const Home = () => {
           {expenses && (
             <Box>
               {expenses.map((expense) => (
-                <Box border="1px solid gray" borderRadius="8px" my={1} p={2}>
+                <Box
+                  key={expense.id}
+                  border="1px solid gray"
+                  borderRadius="8px"
+                  my={1}
+                  p={2}
+                >
                   <div
                     style={{
                       display: "flex",
@@ -180,10 +122,8 @@ const Home = () => {
                     }}
                   >
                     <Typography fontSize={14}>
-                      {expense.timestamp &&
-                        `on ${expense.timestamp.toLocaleString()}`}
+                      {formatTheTime(expense.created_at.toLocaleString())}
                     </Typography>
-                    {/* <Typography fontSize={14}>{expense.timestamp}</Typography> */}
                   </div>
                 </Box>
               ))}

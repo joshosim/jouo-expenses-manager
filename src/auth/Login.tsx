@@ -4,11 +4,13 @@ import { Box, Button, TextField, Typography } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import bgImg from "../assets/expenses.jpg";
 import { useContext, useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../config/firebase";
 import { AuthContext } from "../context/AuthContext";
+import supabase from "../config/superbase";
+import toast from "react-hot-toast";
+
 const Login = () => {
   const goTo = useNavigate();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [togglePassword, setTogglePassword] = useState(false);
@@ -24,19 +26,18 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-        dispatch({ type: "LOGIN", payload: user });
-        setIsLoading(false);
-        goTo("/");
-      })
-      .catch((error) => {
-        const errorMessage = error.message;
-        setError(errorMessage);
-        setIsLoading(false);
-      });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+    toast.success("Logged In!");
+    if (data?.session?.access_token) {
+      localStorage.setItem("token", data?.session?.access_token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      navigate("/");
+    }
+
+    console.log(data);
   };
 
   return (

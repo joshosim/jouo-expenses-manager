@@ -1,35 +1,29 @@
 import { Backdrop, Box, Button, TextField, Typography } from "@mui/material";
 import React, { useContext, useState } from "react";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../config/firebase";
 import { AuthContext } from "../context/AuthContext";
 import { Done } from "@mui/icons-material";
+import supabase from "../config/superbase";
+import toast from "react-hot-toast";
 
 const AddExpenses = () => {
   const [amount, setAmount] = useState<number>(0);
   const [title, setTitle] = useState<string>("");
   const [formError, setFormError] = useState(false);
-  const [onSend, setOnSend] = useState(false);
-  const [sent, setSent] = useState(false);
   const { currentUser } = useContext(AuthContext);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setFormError(false);
-    setOnSend(true);
 
     try {
-      const res = await addDoc(collection(db, "user_expenses"), {
-        title,
-        amount,
-        uid: currentUser.uid,
-        timestamp: serverTimestamp(),
-      });
-      console.log("Document written with ID: ", res.id);
-      setOnSend(false);
-      setSent(true);
-    } catch (e) {
-      console.error("Error adding document: ", e);
+      const { error } = await supabase
+        .from("expenses")
+        .insert({ title, amount });
+      console.log("Success");
+      toast.success("Successfully Added!");
+    } catch (error) {
+      console.log("error", error);
+      toast.error(`Error: ${error}`);
     }
 
     if (!title || !amount) {
@@ -73,7 +67,7 @@ const AddExpenses = () => {
           fullWidth
           type="submit"
         >
-          {onSend ? "Adding....." : "Add"}
+          Add
         </Button>
       </form>
       {formError && (
@@ -87,20 +81,6 @@ const AddExpenses = () => {
         >
           Please fill all fields
         </Typography>
-      )}
-
-      {sent && (
-        <Backdrop open={sent}>
-          <Box bgcolor="#FFF" height="150px" width="200px" borderRadius="10px">
-            <Button variant="text" color="primary" startIcon={<Done />}>
-              Sent
-            </Button>
-            <Button variant="text" color="error" onClick={() => setSent(false)}>
-              Close
-            </Button>
-            <Typography>Close and Refresh your app</Typography>
-          </Box>
-        </Backdrop>
       )}
     </Box>
   );
