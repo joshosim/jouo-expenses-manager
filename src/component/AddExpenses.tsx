@@ -4,32 +4,46 @@ import { AuthContext } from "../context/AuthContext";
 import { Done } from "@mui/icons-material";
 import supabase from "../config/superbase";
 import toast from "react-hot-toast";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Controller, useForm } from "react-hook-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addExpenses } from "../services/expenses";
 
-const AddExpenses = () => {
-  const [amount, setAmount] = useState<number>(0);
-  const [title, setTitle] = useState<string>("");
-  const [formError, setFormError] = useState(false);
+const schema = yup.object().shape({
+  title: yup.string().required("Title is required"),
+  amount: yup.string().required("Amount is required"),
+});
+
+const AddExpenses = ({ onClose }: { onClose: (open: boolean) => void }) => {
   const { currentUser } = useContext(AuthContext);
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const queryClient = useQueryClient();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
-    setFormError(false);
-
-    try {
-      const { error } = await supabase
-        .from("expenses")
-        .insert({ title, amount });
-      console.log("Success");
+  const mutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await addExpenses(data);
+    },
+    onSuccess: (data) => {
+      console.log(data, "data gotten");
       toast.success("Successfully Added!");
-    } catch (error) {
+      queryClient.invalidateQueries({ queryKey: ["EXPENSES"] });
+      onClose(false);
+    },
+    onError: (error) => {
       console.log("error", error);
       toast.error(`Error: ${error}`);
-    }
+    },
+  });
 
-    if (!title || !amount) {
-      setFormError(true);
-      return;
-    }
+  const onSubmit = async (data: any) => {
+    mutation.mutate(data);
   };
 
   return (
@@ -37,51 +51,54 @@ const AddExpenses = () => {
       <Typography mb={2} textAlign="center" fontWeight={600} fontSize={20}>
         AddExpenses
       </Typography>
-      <form action="" onSubmit={handleSubmit}>
-        <TextField
-          variant="outlined"
-          fullWidth
-          InputProps={{ disableUnderline: true }}
-          sx={{ borderRadius: "8px", p: "4px", mb: "12px" }}
-          label="What for"
-          type="text"
-          placeholder="what for"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Controller
+          name="title"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              variant="outlined"
+              fullWidth
+              InputProps={{ disableUnderline: true }}
+              sx={{ borderRadius: "8px", p: "4px", mb: "12px" }}
+              label="What for"
+              type="text"
+              placeholder="what for"
+              error={!!errors?.title}
+              helperText={errors?.title ? errors?.title.message : ""}
+            />
+          )}
         />
-        <TextField
-          variant="outlined"
-          fullWidth
-          InputProps={{ disableUnderline: true }}
-          sx={{ borderRadius: "8px", p: "4px", mb: "12px" }}
-          label="Amount"
-          type="number"
-          placeholder="Amount"
-          value={amount}
-          onChange={(e) => setAmount(parseInt(e.target.value))}
+        <Controller
+          name="amount"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              variant="outlined"
+              fullWidth
+              InputProps={{ disableUnderline: true }}
+              sx={{ borderRadius: "8px", p: "4px", mb: "12px" }}
+              label="Amount"
+              type="number"
+              placeholder="Amount"
+              error={!!errors?.amount}
+              helperText={errors?.amount ? errors?.amount.message : ""}
+            />
+          )}
         />
-        {/* <Box height="250px" /> */}
+
         <Button
           variant="contained"
           sx={{ p: "12px 24px" }}
           fullWidth
           type="submit"
+          disabled={!!mutation.isPending}
         >
-          Add
+          {mutation.isPending ? "Adding..." : "Add"}
         </Button>
       </form>
-      {formError && (
-        <Typography
-          color="red"
-          border="1px solid red"
-          borderRadius="12px"
-          p="12px"
-          my={2}
-          textAlign="center"
-        >
-          Please fill all fields
-        </Typography>
-      )}
     </Box>
   );
 };

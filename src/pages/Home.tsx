@@ -13,20 +13,13 @@ import { AuthContext } from "../context/AuthContext";
 import AppLayout from "../Layout/AppLayout";
 import supabase from "../config/superbase";
 import { parseISO, format } from "date-fns";
-
-interface Expense {
-  id: any;
-  title: string;
-  amount: number;
-  created_at: Date;
-}
+import { useQuery } from "@tanstack/react-query";
+import { getExpenses } from "../services/expenses";
 
 const Home = () => {
   const [fetchError, setFetchError] = useState("");
   const goTo = useNavigate();
   const [totalAmount, setTotalAmount] = useState<number | null>(null);
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const { currentUser } = useContext(AuthContext);
   const [open, setOpen] = useState(false);
   const [openCal, setOpenCal] = useState(false);
@@ -37,14 +30,25 @@ const Home = () => {
     const formattedDate = format(date, "yyyy-MM-dd HH:mm");
     return formattedDate;
   };
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data, error } = await supabase.from("expenses").select();
-      console.log(data);
-      setExpenses(data || []);
-    };
-    fetchData();
-  }, []);
+  const query = useQuery({
+    queryKey: ["EXPENSES"],
+    queryFn: getExpenses,
+  });
+
+  const expenses = query.data || [];
+
+  const getTotalExpenses = async () => {
+    const { data, error } = await supabase.from("expenses").select("amount");
+
+    if (error) {
+      console.error("Error fetching total:", error);
+    } else if (data) {
+      const total = data.reduce((sum, expense) => sum + expense.amount, 0);
+      setTotalAmount(total);
+      // console.log("Total amount:", data);
+    }
+  };
+  getTotalExpenses();
 
   return (
     <AppLayout>
@@ -150,7 +154,7 @@ const Home = () => {
         onClose={() => setOpen(false)}
         drawerHeight="50vh"
       >
-        <AddExpenses />
+        <AddExpenses onClose={() => setOpen(false)} />
       </BottomDrawer>
       <BottomDrawer
         drawerHeight="65"

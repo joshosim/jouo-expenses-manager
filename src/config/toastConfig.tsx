@@ -6,6 +6,7 @@ export const toastOption: DefaultToastOptions = {
       background: "green",
       color: "#fff",
       textTransform: "capitalize",
+      fontFamily: "Sora",
     },
   },
   error: {
@@ -13,6 +14,7 @@ export const toastOption: DefaultToastOptions = {
       background: "red",
       color: "#fff",
       textTransform: "capitalize",
+      fontFamily: "Sora",
     },
   },
 };

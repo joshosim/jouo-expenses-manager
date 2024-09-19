@@ -8,6 +8,7 @@ import Expenses from "../pages/Expenses";
 import TheDate from "../pages/Date";
 import ChatAI from "../pages/ChatAI";
 import Profile from "../pages/Profile";
+import Settings from "../pages/Settings";
 
 const AppRoutes = () => {
   const { currentUser } = useContext(AuthContext);
@@ -57,6 +58,14 @@ const AppRoutes = () => {
         element={
           <AuthGuard>
             <Profile />
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <AuthGuard>
+            <Settings />
           </AuthGuard>
         }
       />
