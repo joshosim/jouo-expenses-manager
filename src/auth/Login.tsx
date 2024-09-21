@@ -37,11 +37,9 @@ const Login = () => {
     },
     onSuccess: (data) => {
       toast.success("Logged In!");
-      if (data?.session?.access_token) {
-        localStorage.setItem("token", data?.session?.access_token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        navigate("/");
-      }
+      localStorage.setItem("token", data?.session?.access_token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      navigate("/");
     },
     onError: (error) => {
       console.log("error", error);
