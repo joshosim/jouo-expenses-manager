@@ -10,6 +10,7 @@ import { AuthContextProvider } from "./context/AuthContext";
 import AppRoutes from "./routes/AppRoutes";
 import { toastOption } from "./config/toastConfig";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { CustomThemeProvider } from "./context/ThemeContext";
 
 const queryClient = new QueryClient();
 
@@ -21,10 +22,10 @@ root.render(
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <AuthContextProvider>
-          <ThemeProvider theme={theme}>
+          <CustomThemeProvider>
             <Toaster toastOptions={toastOption} />
             <AppRoutes />
-          </ThemeProvider>
+          </CustomThemeProvider>
         </AuthContextProvider>
       </QueryClientProvider>
     </BrowserRouter>

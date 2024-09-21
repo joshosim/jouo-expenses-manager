@@ -1,5 +1,5 @@
 import { ArrowUpward, MoreVert } from "@mui/icons-material";
-import { Box, Chip, Divider, Typography } from "@mui/material";
+import { Box, Chip, Divider, Typography, useTheme } from "@mui/material";
 import React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Label } from "recharts";
 
@@ -14,13 +14,14 @@ const ThePie: React.FC<GaugeChartProps> = ({ value }) => {
   ];
 
   const COLORS = ["#379E66", "#E0E0E0"];
+  const theme = useTheme();
 
   return (
     <Box
       width="100%"
       height="auto"
       borderRadius="12px"
-      bgcolor="#FFFFFF"
+      bgcolor="background.primary"
       border="1px solid #E4E7EC"
     >
       <Box
@@ -65,12 +66,11 @@ const ThePie: React.FC<GaugeChartProps> = ({ value }) => {
                 return <Cell key={`cell-${index}`} fill="#379E66" />;
               })}
               <Label
-                //value={`${value}`}
                 value={data[0].value}
                 position="center"
                 style={{
                   fontSize: "24px",
-                  fill: "#000",
+                  fill: theme.palette.text.primary,
                   fontWeight: 600,
                   fontFamily: "Sora",
                 }}
@@ -81,7 +81,11 @@ const ThePie: React.FC<GaugeChartProps> = ({ value }) => {
         <Chip
           label="10"
           size="small"
-          sx={{ fontSize: "14px", bgcolor: "#ABEFC6", color: "#067647" }}
+          sx={{
+            fontSize: "14px",
+            bgcolor: theme.palette.success.light,
+            color: theme.palette.success.dark,
+          }}
           icon={
             <ArrowUpward
               sx={{ height: "16px", width: "16px" }}

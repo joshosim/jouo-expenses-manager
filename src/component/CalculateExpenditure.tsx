@@ -1,4 +1,11 @@
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Grid,
+  TextField,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import React, { useState } from "react";
 
 const CalculateExpenditure = () => {
@@ -21,8 +28,9 @@ const CalculateExpenditure = () => {
     setBills(giving);
     setProject(project);
   };
+  const theme = useTheme();
   return (
-    <Box p={2}>
+    <Box p={2} bgcolor={theme.palette.background.paper}>
       <Typography mb={2} textAlign="center" fontWeight={600} fontSize={20}>
         Calculate Expenditure
       </Typography>

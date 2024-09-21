@@ -66,10 +66,10 @@ const Profile = () => {
                     sx={{ cursor: "pointer" }}
                   />
                 </Box>
-                <Typography textAlign="center" my={2} fontWeight={600}>
+                <Typography textAlign="center" my={1} fontWeight={600}>
                   {`${nh.age} years old` || ""}
                 </Typography>
-                <Typography textAlign="center" my={2} fontWeight={600}>
+                <Typography textAlign="center" my={1} fontWeight={600}>
                   {nh.phone || ""}
                 </Typography>
                 <Typography textAlign="center">{currentUser.email}</Typography>

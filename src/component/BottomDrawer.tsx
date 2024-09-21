@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { ReactNode } from "react";
 import { keyframes } from "@emotion/react";
 import React from "react";
@@ -34,6 +34,8 @@ const BottomDrawer = ({
   onClose,
   drawerHeight = "70vh",
 }: BottomDrawerProps) => {
+  const theme = useTheme();
+
   if (!open) return null;
 
   return (
@@ -57,7 +59,7 @@ const BottomDrawer = ({
         width="100vw"
         bottom={0}
         left={0}
-        bgcolor="#fff"
+        bgcolor={theme.palette.background.paper}
         zIndex={10}
         borderRadius="24px 24px 0px 0px"
         sx={{

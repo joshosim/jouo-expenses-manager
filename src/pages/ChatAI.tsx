@@ -62,7 +62,7 @@ const ChatAI = () => {
 
   return (
     <AppLayout>
-      <Box display="flex" alignItems="center" gap="8px">
+      <Box display="flex" alignItems="center" gap="8px" my={2}>
         <ChevronLeft onClick={() => navigate(-1)} sx={{ cursor: "pointer" }} />
         <Typography fontWeight={600}>Ask JOUO AI</Typography>
       </Box>

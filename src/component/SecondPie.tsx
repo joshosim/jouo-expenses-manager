@@ -55,7 +55,7 @@ export default class SecondPie extends PureComponent {
         height="100%"
         p="24px"
         borderRadius="12px"
-        bgcolor="#FFFFFF"
+        bgcolor="background.primary"
         border="1px solid #E4E7EC"
       >
         <Box display="flex" justifyContent="space-between" alignItems="center">

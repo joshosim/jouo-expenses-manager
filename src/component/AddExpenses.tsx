@@ -1,4 +1,11 @@
-import { Backdrop, Box, Button, TextField, Typography } from "@mui/material";
+import {
+  Backdrop,
+  Box,
+  Button,
+  TextField,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { Done } from "@mui/icons-material";
@@ -16,6 +23,7 @@ const schema = yup.object().shape({
 });
 
 const AddExpenses = ({ onClose }: { onClose: (open: boolean) => void }) => {
+  const theme = useTheme();
   const { currentUser } = useContext(AuthContext);
   const queryClient = useQueryClient();
   const {
@@ -47,7 +55,7 @@ const AddExpenses = ({ onClose }: { onClose: (open: boolean) => void }) => {
   };
 
   return (
-    <Box p={2}>
+    <Box p={2} bgcolor={theme.palette.background.paper}>
       <Typography mb={2} textAlign="center" fontWeight={600} fontSize={20}>
         AddExpenses
       </Typography>
