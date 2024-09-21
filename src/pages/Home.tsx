@@ -65,9 +65,6 @@ const Home = () => {
               height="75px"
               width="75px"
             />
-            <Typography fontSize={12} fontWeight={700} color="green">
-              {currentUser.email}
-            </Typography>
           </Box>
 
           <div>

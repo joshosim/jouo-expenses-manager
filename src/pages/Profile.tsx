@@ -47,7 +47,7 @@ const Profile = () => {
                     <Avatar
                       sx={{ height: "150px", width: "150px", fontSize: "75px" }}
                     >
-                      {nh.firstname.slice(0, 1)}
+                      {nh.firstname.slice(0, 1) || ""}
                     </Avatar>
                   </Stack>
                 </Stack>
@@ -59,7 +59,7 @@ const Profile = () => {
                   gap={2}
                 >
                   <Typography textAlign="center" fontWeight={600}>
-                    {nh.firstname} {nh.lastname}
+                    {nh.firstname || ""} {nh.lastname || ""}
                   </Typography>
                   <Edit
                     onClick={() => navigate("/change-profile")}
@@ -67,10 +67,10 @@ const Profile = () => {
                   />
                 </Box>
                 <Typography textAlign="center" my={2} fontWeight={600}>
-                  {nh.age} years old
+                  {`${nh.age} years old` || ""}
                 </Typography>
                 <Typography textAlign="center" my={2} fontWeight={600}>
-                  {nh.phone}
+                  {nh.phone || ""}
                 </Typography>
                 <Typography textAlign="center">{currentUser.email}</Typography>
               </Box>

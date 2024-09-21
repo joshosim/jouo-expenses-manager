@@ -10,15 +10,15 @@ const TheDate = () => {
   return (
     <AppLayout>
       <Box>
-        <Box display="flex" alignItems="center" gap="8px">
+        <Box display="flex" alignItems="center" gap="8px" my={2}>
           <ChevronLeft
             onClick={() => navigate(-1)}
             sx={{ cursor: "pointer" }}
           />
-          <Typography fontWeight={600}>Data Manager</Typography>
+          <Typography fontWeight={600}>Date Manager</Typography>
         </Box>
 
-        <div>
+        <div style={{ margin: "20px" }}>
           <Scheduler
             view="month"
             events={[

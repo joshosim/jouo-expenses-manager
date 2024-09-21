@@ -3,21 +3,23 @@ import React, { useState } from "react";
 
 const CalculateExpenditure = () => {
   const [money, setMoney] = useState(0);
-  const [tithe, setTithe] = useState(0);
-  const [savings, setSavings] = useState(0);
-  const [needs, setNeeds] = useState(0);
-  const [wants, setWants] = useState(0);
+  const [food, setFood] = useState(0);
+  const [transport, setTransport] = useState(0);
+  const [giving, setGiving] = useState(0);
+  const [project, setProject] = useState(0);
+  const [bills, setBills] = useState(0);
 
   const handleCalculate = (money: number) => {
-    let tithe = money * 0.1;
-    let theMoney = money - tithe;
-    let savings = theMoney * 0.1;
-    let needs = theMoney * 0.5;
-    let wants = theMoney * 0.4;
-    setTithe(tithe);
-    setSavings(savings);
-    setNeeds(needs);
-    setWants(wants);
+    let food = money * 0.35;
+    let transport = money * 0.2;
+    let bills = money * 0.1;
+    let giving = money * 0.2;
+    let project = money * 0.15;
+    setFood(food);
+    setTransport(transport);
+    setGiving(bills);
+    setBills(giving);
+    setProject(project);
   };
   return (
     <Box p={2}>
@@ -33,7 +35,7 @@ const CalculateExpenditure = () => {
         label="Amount"
         type="number"
         value={money}
-        placeholder="Amount"
+        placeholder="Salary"
         onChange={(e) => setMoney(parseFloat(e.target.value))}
       />
       <Grid
@@ -50,8 +52,8 @@ const CalculateExpenditure = () => {
             my: "8px",
           }}
         >
-          <Typography>TITHE</Typography>
-          {tithe}
+          <Typography>FOOD</Typography>
+          {food}
         </Box>
         <Box
           height="100px"
@@ -64,8 +66,8 @@ const CalculateExpenditure = () => {
             my: "8px",
           }}
         >
-          <Typography>SAVINGS</Typography>
-          {savings}
+          <Typography>BILLS</Typography>
+          {bills}
         </Box>
         <Box
           height="100px"
@@ -78,8 +80,8 @@ const CalculateExpenditure = () => {
             my: "8px",
           }}
         >
-          <Typography>NEEDS</Typography>
-          {needs}
+          <Typography>TRANSPORT</Typography>
+          {transport}
         </Box>
         <Box
           height="100px"
@@ -92,8 +94,22 @@ const CalculateExpenditure = () => {
             my: "8px",
           }}
         >
-          <Typography>WANTS</Typography>
-          {wants}
+          <Typography>PROJECT</Typography>
+          {project}
+        </Box>
+        <Box
+          height="100px"
+          sx={{
+            display: "grid",
+            placeItems: "center",
+            p: "12px",
+            border: "1px solid gray",
+            borderRadius: "8px",
+            my: "8px",
+          }}
+        >
+          <Typography>GIVING</Typography>
+          {giving}
         </Box>
       </Grid>
       <Button
