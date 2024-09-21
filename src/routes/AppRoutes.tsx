@@ -9,6 +9,7 @@ import TheDate from "../pages/Date";
 import ChatAI from "../pages/ChatAI";
 import Profile from "../pages/Profile";
 import Settings from "../pages/Settings";
+import ChangeProfile from "../pages/ChangeProfile";
 
 const AppRoutes = () => {
   const { currentUser } = useContext(AuthContext);
@@ -58,6 +59,14 @@ const AppRoutes = () => {
         element={
           <AuthGuard>
             <Profile />
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/change-profile"
+        element={
+          <AuthGuard>
+            <ChangeProfile />
           </AuthGuard>
         }
       />

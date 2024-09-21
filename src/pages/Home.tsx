@@ -31,14 +31,17 @@ const Home = () => {
     return formattedDate;
   };
   const query = useQuery({
-    queryKey: ["EXPENSES"],
-    queryFn: getExpenses,
+    queryKey: ["EXPENSES", currentUser.id],
+    queryFn: () => getExpenses(currentUser.id),
   });
 
   const expenses = query.data || [];
 
   const getTotalExpenses = async () => {
-    const { data, error } = await supabase.from("expenses").select("amount");
+    const { data, error } = await supabase
+      .from("expenses")
+      .select("amount")
+      .eq("uuid", currentUser.id);
 
     if (error) {
       console.error("Error fetching total:", error);
@@ -95,7 +98,7 @@ const Home = () => {
           {fetchError && <p>{fetchError}</p>}
           {expenses && (
             <Box>
-              {expenses.map((expense) => (
+              {expenses.map((expense: any) => (
                 <Box
                   key={expense.id}
                   border="1px solid gray"
@@ -125,9 +128,7 @@ const Home = () => {
                       justifyContent: "space-between",
                     }}
                   >
-                    <Typography fontSize={14}>
-                      {formatTheTime(expense.created_at.toLocaleString())}
-                    </Typography>
+                    <Typography fontSize={14}>{expense.created_at}</Typography>
                   </div>
                 </Box>
               ))}

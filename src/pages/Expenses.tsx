@@ -2,6 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { ChevronLeft } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "../Layout/AppLayout";
+import { PieCharts } from "../component/PieChart";
 
 const Expenses = () => {
   const navigate = useNavigate();
@@ -14,6 +15,9 @@ const Expenses = () => {
             sx={{ cursor: "pointer" }}
           />
           <Typography fontWeight={600}>Expenses</Typography>
+        </Box>
+        <Box>
+          <PieCharts />
         </Box>
       </Box>
     </AppLayout>

@@ -11,6 +11,35 @@ import AppLayout from "../Layout/AppLayout";
 import { useEffect, useState } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+const formatData = (text: string) => {
+  const lines = text.split("\n").filter((line) => line.trim() !== ""); // Splits by lines
+
+  return lines.map((line, index) => {
+    if (line.startsWith("**")) {
+      // Render headers (bold or h5)
+      return (
+        <Typography key={index} variant="h6" gutterBottom>
+          {line.replace(/\*\*/g, "")}
+        </Typography>
+      );
+    } else if (line.startsWith("*")) {
+      // Render bullet points
+      return (
+        <Typography key={index} variant="body2" gutterBottom>
+          {line.replace(/\*/g, "")}
+        </Typography>
+      );
+    } else {
+      // Render normal paragraphs
+      return (
+        <Typography key={index} variant="body2" paragraph>
+          {line}
+        </Typography>
+      );
+    }
+  });
+};
+
 const ChatAI = () => {
   const navigate = useNavigate();
   const [resp, setResp] = useState("");
@@ -35,7 +64,7 @@ const ChatAI = () => {
     <AppLayout>
       <Box display="flex" alignItems="center" gap="8px">
         <ChevronLeft onClick={() => navigate(-1)} sx={{ cursor: "pointer" }} />
-        <Typography fontWeight={600}>Ask AI</Typography>
+        <Typography fontWeight={600}>Ask JOUO AI</Typography>
       </Box>
 
       {isWaiting ? (
@@ -49,8 +78,20 @@ const ChatAI = () => {
           <CircularProgress />
         </Box>
       ) : (
-        <Typography fontWeight={400} fontSize={14} p={2} textAlign="justify">
-          {resp}
+        <Typography fontSize={12} p={2}>
+          {formatData(resp)}
+          {resp === "" && (
+            <Typography
+              display="grid"
+              justifyContent="center"
+              sx={{ alignItems: "center", minHeight: "50vh" }}
+            >
+              <Typography fontSize={12} display="flex" alignItems="center">
+                <span>Ask Jouo AI about your expenses</span>
+                <span className="wave">👋</span>
+              </Typography>
+            </Typography>
+          )}
         </Typography>
       )}
 

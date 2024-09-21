@@ -28,7 +28,7 @@ const AddExpenses = ({ onClose }: { onClose: (open: boolean) => void }) => {
 
   const mutation = useMutation({
     mutationFn: async (data: any) => {
-      return await addExpenses(data);
+      return await addExpenses({ ...data, uuid: currentUser.id });
     },
     onSuccess: (data) => {
       console.log(data, "data gotten");
